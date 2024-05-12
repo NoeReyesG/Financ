@@ -1,0 +1,38 @@
+{% extends 'financiera/layout.html'%}
+{% load static %}
+
+
+{% block body %}
+
+<section class ="container1">
+    <div>  
+      <h2 class="text-center mb-2">Iniciar sesión</h2>
+
+      {% if message %}
+          <div style="text-align:center; margin-bottom: 3px; color:red;">{{ message }}</div>
+      {% endif %}
+  
+      <form action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3 form-group">
+              <input autofocus class="form-control" type="text" name="username" placeholder="Username" id="username">
+          </div>
+          <div class="mb-3">
+              <input class="form-control" type="password" name="password" placeholder="Password">
+          </div>
+          <div class="d-flex justify-content-center mb-2">
+            <button class="btn btn-primary" type="submit" id="btn-login">
+                Iniciar sesión
+            </button>
+          </div>
+      </form>
+
+      ¿No tienes cuenta? <a href="{% url 'sign-in' %}">Registrate aquí.</a>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'financiera/login.js' %}"></script>
+{% endblock %}

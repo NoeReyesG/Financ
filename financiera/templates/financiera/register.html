@@ -1,0 +1,44 @@
+{% extends 'financiera/layout.html'%}
+
+{% block body %}
+
+<div class ="container1">
+    <div class ="text-center">  
+      <h2 class="mb-3">Registro de usuario</h2>
+  
+      {% if message %}
+          <div style="padding-bottom: 5px; color:red;">{{ message }}</div>
+      {% endif %}
+  
+      <form action="{% url 'sign-in' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+              <input class="form-control" autofocus type="text" name="username" placeholder="Nombre de Usuario" required>
+          </div>
+
+          <div class="mb-3">
+            <input class="form-control" type="text" name="first-name" placeholder="Nombre(s)" required>
+          </div>
+
+          <div class="mb-3">
+            <input class="form-control" type="text" name="last-name" placeholder="Apellidos" required>
+          </div>
+        
+          <div class="mb-3">
+              <input class="form-control" type="email" name="email" placeholder="Email" required>
+          </div>
+          <div class="mb-3">
+              <input class="form-control" type="password" name="password" placeholder="Contraseña" required>
+          </div>
+          <div class="mb-3">
+              <input class="form-control" type="password" name="confirmation" placeholder="Confirmar Contraseña">
+          </div>
+          <div class="d-flex justify-content-center">
+            <input class="btn btn-primary" type="submit" value="Registrar">
+          </div>
+      </form>
+      ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión.</a>
+    </div>
+  </div>
+
+{% endblock %}
