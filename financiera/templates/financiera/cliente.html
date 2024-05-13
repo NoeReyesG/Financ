@@ -1,0 +1,72 @@
+{% extends 'financiera/layout.html' %}
+{% load static %}
+
+{% block body %}
+    
+    <form class="m-2" id="cliente" onsubmit="editar(event)">
+        <p class="fs-3 m-2">Datos del cliente</p>    
+        <section class="row g-3 m-2">
+            <!-- <div class="col-md-2"></div> -->
+            <div class="col-md-2">
+                <label for="first_name" class="form-label">Nombre(s)</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" disabled value = {{cliente.nombre}} >
+            </div>
+            <div class="col-md-2">
+                <label for="last_name1" class="form-label">Apellido Paterno</label>
+                <input type="text" class="form-control" id="last_name1" name="last_name1" disabled value = {{cliente.apellido_paterno}}>
+            </div>
+            <div class="col-md-2">
+                <label for="last_name2" class="form-label">Apellido Materno</label>
+                <input type="text" class="form-control" id="last_name2" name="last_name2" disabled value ={{cliente.apellido_materno}}>
+            </div>
+            <div class="col-md-2">
+                <label for="nacimiento{{cliente.id}}" class="form-label">Nacimiento</label>
+                <input type="date" class="form-control" id="nacimiento{{cliente.id}}" name="nacimiento" disabled value = {{cliente.nacimiento | date:"Y-m-d"}}>
+            </div>
+            <div class="col-md-2"></div>
+            
+        </section>
+
+        <p class="fs-3 m-2">Domicilio</p>
+        <section class="row g-3 m-2">
+            <div class="col-md-2">
+                <label for="calle" class="form-label">Calle</label>
+                <input type="text" class="form-control" id="calle" name="calle" disabled value = {{cliente.calle}} >
+            </div>
+            <div class="col-md-1">
+                <label for="numero" class="form-label">Número</label>
+                <input type="number" class="form-control" id="numero" name="numero" disabled value = {{cliente.numero}}>
+            </div>
+            <div class="col-md-3">
+                <label for="colonia" class="form-label">Colonia</label>
+                <input type="text" class="form-control" id="colonia" name="colonia" disabled value ={{cliente.colonia}}>
+            </div>
+            <div class="col-md-2">
+                <label for="ciudad" class="form-label">Ciudad</label>
+                <input type="text" class="form-control" id="ciudad" name="nacimiento" disabled value = {{cliente.ciudad}}>
+            </div>
+        </section>
+        <p class="fs-3 m-2">Contacto</p>
+        <section class="row g-3 m-2">
+            <div class="col-md-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="text" class="form-control" id="telefono" name="telefono" disabled value = {{cliente.telefono}} >
+            </div>
+            <!-- <div class="col-md-3">
+                <label for="numero" class="form-label">Número</label>
+                <input type="number" class="form-control" id="numero" name="numero" disabled value = {{cliente.numero}}>
+            </div> -->
+        </section>
+        <div class="col-8 d-flex justify-content-end p-3 m-2">
+            <button class="btn btn-warning" id="editar-btn" type="submit">Editar</button>
+        </div>
+    </form>
+    <!-- <div class="col-8 d-flex justify-content-end p-3 m-2">
+        <button class="btn btn-warning" onclick="editar()">Editar...</button>
+    </div> -->
+{% endblock %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'financiera/cliente.js' %}"></script>
+{% endblock %}

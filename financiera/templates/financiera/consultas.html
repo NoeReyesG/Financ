@@ -1,7 +1,7 @@
 {% extends 'financiera/layout.html'%}
+{% load static %}
 
 {% block body %}
-
 <section class="accordion" id="accordionFilter">
     <div class="accordion-item">
       <h2 class="accordion-header">
@@ -65,7 +65,14 @@
     </div>
 </section>
 
-    Aquí van los resultados
+
+{% if clientes %}
+
+<div class="m-3" >
+ <h2> Resultados</h2>
+</div>
+
+{% endif %}
 
 {% for cliente in clientes %}
 <section class="accordion" id="accordionClient{{cliente.id}}">
@@ -79,8 +86,7 @@
         <div class="accordion-body">
 
             <!-- Form -->
-            <form class="row g-3" method="post">
-                {% csrf_token %}
+            <form class="row g-3">
                 <div class="col-md-3">
                   <label for="first_name" class="form-label">Nombre(s)</label>
                   <input type="text" class="form-control" id="first_name" name="first_name" disabled value = {{cliente.nombre}} >
@@ -98,10 +104,10 @@
                   <input type="date" class="form-control" id="nacimiento{{cliente.id}}" name="nacimiento" disabled value = {{cliente.nacimiento | date:"Y-m-d"}}>
                 </div>
 
-                <div class="col-12 d-flex justify-content-end">
-                    <button type="submit" class="btn btn-warning">Editar</button>
-                  </div>
             </form>
+            <div class="col-12 d-flex justify-content-end p-3 m-2">
+              <a href="{% url 'cliente' cliente.id %}"><button class="btn btn-warning">Más...</button>
+            </div>
             <!-- end Form -->
 
         </div>

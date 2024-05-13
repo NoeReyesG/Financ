@@ -7,6 +7,7 @@ from django  import forms
 from .models import Cliente, User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.validators import RegexValidator
 
 
 
@@ -22,6 +23,8 @@ class customerForm(forms.Form):
     colonia = forms.CharField(label="Colonia", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
     ciudad = forms.CharField(label="Ciudad", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
     cp = forms.CharField(label = "C.P.", max_length=4, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    telefono_regex = RegexValidator(regex=r'\d{10,10}$', message="Formato permitido: '+52 4431234567'. Diez digitos.")
+    telefono = forms.CharField(validators=[telefono_regex], max_length=13, required=False, widget = forms.TextInput(attrs = {'class':'form-control', 'type':'number'})) 
 
 @login_required
 def index(request):
@@ -35,7 +38,6 @@ def login_user(request):
         username = request.POST["username"]
         password = request.POST["password"]
         user = authenticate(request, username=username, password=password)
-
         # Check if authentication successful
         if user is not None:
             login(request, user)
@@ -94,10 +96,13 @@ def registrarCliente(request):
             cliente = cliente.cleaned_data
         
             try:
-                Cliente.objects.get(nombre=cliente["nombre"], apellido_materno = cliente["apellido_materno"], nacimiento=cliente["nacimiento"])
+                Cliente.objects.get(user_id = request.user,
+                                    nombre=cliente["nombre"], 
+                                    apellido_materno = cliente["apellido_materno"], 
+                                    nacimiento=cliente["nacimiento"])
             except:
                 print(cliente)
-                clienteDB=Cliente(**cliente)
+                clienteDB=Cliente(user_id = request.user, **cliente)
                 print(clienteDB)
                 clienteDB.save()
                 context["registerclientform"] = customerForm()
@@ -108,32 +113,22 @@ def registrarCliente(request):
                 context["mensaje_error"] = "Cliente resgistrado previamente "
                 return render(request, "financiera/registrarCliente.html", context)
 
-            # try:
-            #     clienteDB = Cliente.objects.filter()
-            #     user = Cliente.objects.create_user(clienteDB)
-            #     user.save()
-            # except IntegrityError:
-            #     return render(request, "financiera/registarCliente.html", {
-            #             "message": "Username already taken."
-            #     })
-        print("entró a post")
-
         return HttpResponse("Ok")
     else:
         context['registerclientform'] = customerForm()
         return render(request, 'financiera/registrarCliente.html', context)
     
-
+@login_required
 def consultar_cliente(request):
     if request.method == 'POST':
-        filtro = {}
+        filtro = {'user_id': request.user}
 
         if request.POST['first_name']:
-            filtro['nombre'] = request.POST['first_name']
+            filtro['nombre__iexact'] = request.POST['first_name']
         if request.POST['last_name1']:
-            filtro['apellido_paterno'] = request.POST['last_name1']
+            filtro['apellido_paterno__iexact'] = request.POST['last_name1']
         if request.POST['last_name2']:
-            filtro['apellido_materno'] = request.POST['last_name2'] 
+            filtro['apellido_materno__iexact'] = request.POST['last_name2'] 
         if request.POST['nacimiento']:
             filtro['nacimiento'] = request.POST['nacimiento']
 
@@ -142,10 +137,26 @@ def consultar_cliente(request):
         print(clientes)
         for cliente in clientes:
             print(cliente.nacimiento)
-            print(cliente.apellido_materno)
+            print(cliente.telefono)
         print("algo")
         return render(request, "financiera/consultas.html", {
             "clientes" : clientes
         })
     else:
         return render(request, "financiera/consultas.html")
+    
+
+#Administración de cliente
+@login_required
+def cliente_config(request, id=None):
+    if request.method == 'POST':
+        pass
+    else:
+        if id:
+            cliente = Cliente.objects.filter(user_id = request.user, id = id)
+            print(cliente[0])
+    return render(request, "financiera/cliente.html", {
+        'cliente': cliente[0]
+    })
+
+#return HttpResponseRedirect(reverse("mission", kwargs={"id": mission_id}))

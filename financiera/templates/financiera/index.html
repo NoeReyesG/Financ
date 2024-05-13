@@ -1,4 +1,6 @@
 {% extends 'financiera/layout.html' %}
 {% block body %}
-<h2>Hola mundo 2!</h2>
+    <p class="container1 fs-3">
+    Bienvenido {{user.get_username | title}}
+    </p>
 {% endblock %}
