@@ -113,7 +113,7 @@ def registrarCliente(request):
                 context["mensaje_error"] = "Cliente resgistrado previamente "
                 return render(request, "financiera/registrarCliente.html", context)
 
-        return HttpResponse("Ok")
+        return HttpResponse("Invalid Data")
     else:
         context['registerclientform'] = customerForm()
         return render(request, 'financiera/registrarCliente.html', context)
@@ -159,4 +159,13 @@ def cliente_config(request, id=None):
         'cliente': cliente[0]
     })
 
-#return HttpResponseRedirect(reverse("mission", kwargs={"id": mission_id}))
+
+# def actualizar_cliente(cliente, pk):
+
+def nuevo_prestamo(request, cliente_id):
+    if request.method == 'POST':
+        cantidad = request.POST['cantidad']
+        plazo = request.POST['plazo']
+        print(cantidad, plazo)
+
+    return HttpResponseRedirect(reverse("cliente", kwargs={"id": cliente_id}))

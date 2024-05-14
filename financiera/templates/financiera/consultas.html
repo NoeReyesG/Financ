@@ -75,6 +75,7 @@
 {% endif %}
 
 {% for cliente in clientes %}
+{{cliente.id}}
 <section class="accordion" id="accordionClient{{cliente.id}}">
     <div class="accordion-item">
         <h2 class="accordion-header">
@@ -106,7 +107,7 @@
 
             </form>
             <div class="col-12 d-flex justify-content-end p-3 m-2">
-              <a href="{% url 'cliente' cliente.id %}"><button class="btn btn-warning">Más...</button>
+              <a href="{% url 'cliente' cliente.id %}"><button class="btn btn-warning">Más...</button></a>
             </div>
             <!-- end Form -->
 

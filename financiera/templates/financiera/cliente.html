@@ -4,7 +4,17 @@
 {% block body %}
     
     <form class="m-2" id="cliente" onsubmit="editar(event)">
-        <p class="fs-3 m-2">Datos del cliente</p>    
+        <div class="d-flex justify-content-between">
+            <p class="fs-3 mx-3">Datos del cliente</p>
+            
+            <button type="button"
+            class="btn btn-primary my-3 mx-5"
+            data-bs-toggle="modal" 
+            data-bs-target="#prestamoModal"> Nuevo prestamo</button>
+
+        </div>
+        
+
         <section class="row g-3 m-2">
             <!-- <div class="col-md-2"></div> -->
             <div class="col-md-2">
@@ -23,7 +33,9 @@
                 <label for="nacimiento{{cliente.id}}" class="form-label">Nacimiento</label>
                 <input type="date" class="form-control" id="nacimiento{{cliente.id}}" name="nacimiento" disabled value = {{cliente.nacimiento | date:"Y-m-d"}}>
             </div>
-            <div class="col-md-2"></div>
+            <div class="col-md-2">
+                
+            </div>
             
         </section>
 
@@ -64,6 +76,41 @@
     <!-- <div class="col-8 d-flex justify-content-end p-3 m-2">
         <button class="btn btn-warning" onclick="editar()">Editar...</button>
     </div> -->
+
+
+    <!--Modal para nuevo prestamo-->
+    <section class="modal fade" id="prestamoModal" tabindex="-1" aria-labelledby="prestamoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="prestamoModalLabel">Nuevo prestamo a nombre de {{cliente}}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'nuevo-prestamo' cliente.id %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class ="mb-3">
+                        <label for="cantidad" class="form-label">Cantidad</label>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad">
+                    </div>
+                    <select class="form-select" aria-label="Default select" id="plazo" name="plazo">
+                        <option selected disabled>Selecciona un plazo</option>
+                        <option value="3">3 meses</option>
+                        <option value="6">6 meses</option>
+                        <option value="9">9 meses</option>
+                        <option value="12">12 meses</option>
+                        <option value="18">18 meses</option>
+                        <option value="24">24 meses</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" id="btn-prestamo" class="btn btn-primary">Agregar</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
 {% endblock %}
 
 

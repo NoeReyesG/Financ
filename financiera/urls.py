@@ -8,7 +8,10 @@ urlpatterns = [
     path("logout", views.logout_view, name ="logout" ),
     path("registrar", views.registrarCliente, name="registrar"),
     path("consultar", views.consultar_cliente, name ="consultar"),
-    path("cliente/<int:id>", views.cliente_config, name="cliente")
+    path("cliente/<int:id>", views.cliente_config, name="cliente"),
+
+    #API
+    path("nuevo-prestamo/<int:cliente_id>", views.nuevo_prestamo, name="nuevo-prestamo")
 
     #path('', views.home, name="home")
 

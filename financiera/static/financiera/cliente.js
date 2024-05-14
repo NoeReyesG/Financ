@@ -19,8 +19,12 @@ function editar(event){
         inputs = document.querySelectorAll('#cliente input');
         inputs.forEach(input => {
             input.disabled = false;
-            // input.style.backgroundColor= 'red';
         });
         save = !save;
     }
+}
+
+function agregar_prestamo(e){
+    e.preventDefault();
+    console.log("ojo aquí");
 }
