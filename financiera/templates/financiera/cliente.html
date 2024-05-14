@@ -70,20 +70,41 @@
             </div> -->
         </section>
         <div class="col-8 d-flex justify-content-end p-3 m-2">
-            <button class="btn btn-warning" id="editar-btn" type="submit">Editar</button>
+            <button class="btn btn-warning" id="editar-btn" type="submit">Editar cliente</button>
         </div>
     </form>
-    <!-- <div class="col-8 d-flex justify-content-end p-3 m-2">
-        <button class="btn btn-warning" onclick="editar()">Editar...</button>
-    </div> -->
 
+
+    {% for prestamo in prestamos %}
+    <p class="fs-3 m-2">Prestamos</p>
+    <section class="row g-3 m-2">
+        <div class="col-md-2">
+            <label for="cantidad-inicial{{prestamo.id}}" class="form-label">Prestamo por:</label>
+            <input type="text" class="form-control" id="cantidad-inicial" name="cantidad-inicial{{prestmo.id}}" disabled value = {{prestamo.cantidad_inicial}} >
+        </div>
+        <div class="col-md-1">
+            <label for="interes{{prestamo.id}}" class="form-label">Interés</label>
+            <input type="number" class="form-control" id="interes{{prestamo.id}}" name="interes{{prestamo.id}}" disabled value = {{prestamo.interes}}>
+        </div>
+        <div class="col-md-3">
+            <label for="saldo{{prestamo.id}}" class="form-label">Saldo restante</label>
+            <input type="text" class="form-control" id="saldo{{prestamo.id}}" name="saldo{{prestamo.id}}" disabled value ={{prestamo.balance}}>
+        </div>
+        <div class="col-md-2">
+            <label for="fecha{{prestamo.id}}" class="form-label">Fecha de contratación</label>
+            <input type="date" class="form-control" id="ciudad" name="fecha{{prestamo.id}}" disabled value = {{prestamo.fecha | date:"Y-m-d"}}>
+        </div>
+    </section>
+    {%empty%}
+        <p class="fs-3 m-2 p-2">Cliente sin prestamos</p>
+    {% endfor %}
 
     <!--Modal para nuevo prestamo-->
     <section class="modal fade" id="prestamoModal" tabindex="-1" aria-labelledby="prestamoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="prestamoModalLabel">Nuevo prestamo a nombre de {{cliente}}</h1>
+              <h1 class="modal-title fs-5" id="prestamoModalLabel">Nuevo prestamo a nombre de {{cliente.nombre}} {{cliente.apellido_paterno}} {{cliente.apellido_materno}}</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{% url 'nuevo-prestamo' cliente.id %}" method="post">
@@ -91,9 +112,13 @@
                 <div class="modal-body">
                     <div class ="mb-3">
                         <label for="cantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="cantidad" name="cantidad">
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" required>
                     </div>
-                    <select class="form-select" aria-label="Default select" id="plazo" name="plazo">
+                    <div class ="mb-3">
+                        <label for="interes" class="form-label">Interes</label>
+                        <input type="number" class="form-control" id="interes" name="interes" required placeholder="0.00%" step="0.01", min="0">
+                    </div>
+                    <select class="form-select" aria-label="Default select" id="parcialidades" name="parcialidades" required>
                         <option selected disabled>Selecciona un plazo</option>
                         <option value="3">3 meses</option>
                         <option value="6">6 meses</option>

@@ -14,7 +14,7 @@ function editar(event){
 
         submitButton = document.querySelector('#editar-btn');
         submitButton.innerHTML='';
-        submitButton.innerHTML='Guardar';
+        submitButton.innerHTML='Guardar cambios';
         console.log("2");
         inputs = document.querySelectorAll('#cliente input');
         inputs.forEach(input => {

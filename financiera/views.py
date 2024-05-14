@@ -2,9 +2,8 @@ from django.db import IntegrityError
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from django.views import generic
 from django  import forms
-from .models import Cliente, User
+from .models import Cliente, User, Prestamo
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.validators import RegexValidator
@@ -26,10 +25,11 @@ class customerForm(forms.Form):
     telefono_regex = RegexValidator(regex=r'\d{10,10}$', message="Formato permitido: '+52 4431234567'. Diez digitos.")
     telefono = forms.CharField(validators=[telefono_regex], max_length=13, required=False, widget = forms.TextInput(attrs = {'class':'form-control', 'type':'number'})) 
 
-@login_required
 def index(request):
-    return render(request, "financiera/index.html")
-
+    if request.user.is_authenticated:
+        return render(request, "financiera/index.html")
+    else:
+        return HttpResponseRedirect(reverse('login'))
 
 def login_user(request):
     '''Inicio de sesión del usuario'''
@@ -47,7 +47,10 @@ def login_user(request):
                 "message": "Usuario o password incorrecto"
             })
     else:
-        return render(request, "financiera/login.html")
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("home"))
+        else:
+            return render(request, "financiera/login.html")
     
 def logout_view(request):
     logout(request)
@@ -149,23 +152,34 @@ def consultar_cliente(request):
 #Administración de cliente
 @login_required
 def cliente_config(request, id=None):
+    context = {}
     if request.method == 'POST':
         pass
     else:
         if id:
             cliente = Cliente.objects.filter(user_id = request.user, id = id)
-            print(cliente[0])
-    return render(request, "financiera/cliente.html", {
-        'cliente': cliente[0]
-    })
+            prestamos = Prestamo.objects.filter(cliente_id = cliente[0])
+            context['cliente'] = cliente[0]
+            context['prestamos'] = prestamos
+    return render(request, "financiera/cliente.html", context)
 
 
 # def actualizar_cliente(cliente, pk):
-
+@login_required
 def nuevo_prestamo(request, cliente_id):
     if request.method == 'POST':
         cantidad = request.POST['cantidad']
-        plazo = request.POST['plazo']
-        print(cantidad, plazo)
+        parcialidades = request.POST['parcialidades']
+        interes = request.POST['interes']
+
+        cliente = Cliente.objects.get(pk=cliente_id, user_id = request.user)
+
+        nuevo_prestamo = Prestamo(cliente_id = cliente, 
+                                cantidad_inicial = cantidad,
+                                balance = cantidad,
+                                parcialidades = parcialidades,
+                                interes = interes
+                                )
+        nuevo_prestamo.save()
 
     return HttpResponseRedirect(reverse("cliente", kwargs={"id": cliente_id}))

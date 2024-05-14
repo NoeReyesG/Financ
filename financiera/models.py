@@ -24,15 +24,16 @@ class Cliente (models.Model):
     telefono_regex = RegexValidator(regex=r'^\d{10,10}$', message="Formato permitido: '4431234567'. Diez digitos.")
     telefono = models.CharField(blank = True, validators=[telefono_regex], max_length=13) 
 
-    def __str__(self):
-        string = self.nombre + " " + self.apellido_paterno + " " + self.apellido_materno
-        return string 
+    # def __str__(self):
+    #     string = self.nombre + " " + self.apellido_paterno + " " + self.apellido_materno
+    #     return string 
     
 class Prestamo(models.Model):
     cliente_id = models.ForeignKey(Cliente, on_delete=models.PROTECT)
-    cantidad_inicial = models.DecimalField(max_digits= 5, decimal_places=2)
-    balance = models.DecimalField(max_digits = 5, decimal_places=2)
+    cantidad_inicial = models.DecimalField(max_digits= 7, decimal_places=2)
+    balance = models.DecimalField(max_digits = 7, decimal_places=2)
     parcialidades = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(48)])
+    interes = models.DecimalField(max_digits=4, decimal_places=2, default=0)
     fecha = models.DateTimeField(auto_now_add=True)
     
 class Abono(models.Model):
