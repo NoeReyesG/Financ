@@ -12,7 +12,8 @@ urlpatterns = [
     path("cliente/<int:id>", views.cliente_config, name="cliente"),
 
     #API
-    path("nuevo-prestamo/<int:cliente_id>", views.nuevo_prestamo, name="nuevo-prestamo")
+    path("nuevo-prestamo/<int:cliente_id>", views.nuevo_prestamo, name="nuevo-prestamo"),
+    path("pago/<int:prestamo_id>", views.pago, name="pago")
 
     #path('', views.home, name="home")
 

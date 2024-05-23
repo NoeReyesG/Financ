@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django  import forms
-from .models import Cliente, User, Prestamo
+from .models import Cliente, User, Prestamo, Abono
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.validators import RegexValidator
@@ -183,3 +183,16 @@ def nuevo_prestamo(request, cliente_id):
         nuevo_prestamo.save()
 
     return HttpResponseRedirect(reverse("cliente", kwargs={"id": cliente_id}))
+
+
+@login_required
+def pago(request, prestamo_id):
+    # Registra un pago
+    if request.method == 'POST':
+        cantidad = request.POST['pagoInp'+str(prestamo_id)]
+        # user = User.objects.filter(id=request.user)
+        prestamo = Prestamo.objects.filter(id = prestamo_id)
+        abono = Abono(prestamo_id = prestamo[0], cantidad = cantidad)
+        abono.save()
+        print(request.user, prestamo_id, abono)
+        return HttpResponse('Todo chido')

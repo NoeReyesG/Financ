@@ -2,69 +2,57 @@
 {% load static %}
 
 {% block body %}
-<section class="accordion" id="accordionFilter">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          Filtros
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionFilter">
-        <div class="accordion-body">
-            <form class="row g-3" method="post">
-                {% csrf_token %}
-                <div class="col-md-3">
-                  <label for="first_name" class="form-label">Nombre(s)</label>
-                  <input type="text" class="form-control" id="first_name" name="first_name">
-                </div>
-                <div class="col-md-3">
-                  <label for="last_name1" class="form-label">Apellido Paterno</label>
-                  <input type="text" class="form-control" id="last_name1" name="last_name1">
-                </div>
-                <div class="col-md-3">
-                  <label for="last_name2" class="form-label">Apellido Materno</label>
-                  <input type="text" class="form-control" id="last_name2" name="last_name2">
-                </div>
-                <div class="col-md-3">
-                  <label for="nacimiento" class="form-label">Nacimiento</label>
-                  <input type="date" class="form-control" id="nacimiento" name="nacimiento" >
-                </div>
-                <!-- <div class="col-12">
-                  <label for="inputAddress2" class="form-label">Address 2</label>
-                  <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
-                </div>
-                <div class="col-md-6">
-                  <label for="inputCity" class="form-label">City</label>
-                  <input type="text" class="form-control" id="inputCity">
-                </div>
-                <div class="col-md-4">
-                  <label for="inputState" class="form-label">State</label>
-                  <select id="inputState" class="form-select">
-                    <option selected>Choose...</option>
-                    <option>...</option>
-                  </select>
-                </div>
-                <div class="col-md-2">
-                  <label for="inputZip" class="form-label">Zip</label>
-                  <input type="text" class="form-control" id="inputZip">
-                </div>
-                <div class="col-12">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="gridCheck">
-                    <label class="form-check-label" for="gridCheck">
-                      Check me out
-                    </label>
-                  </div>
-                </div> -->
-                <div class="col-12 d-flex justify-content-end">
-                  <button type="submit" class="btn btn-primary">Buscar</button>
-                </div>
-              </form>
-        </div>
+  <h2 class="m-3">Buscar cliente</h2>
+  <form class="row g-3 m-3" method="post">
+      {% csrf_token %}
+      <div class="col-md-3">
+        <label for="first_name" class="form-label">Nombre(s)</label>
+        <input type="text" class="form-control" id="first_name" name="first_name">
       </div>
-    </div>
-</section>
-
+      <div class="col-md-3">
+        <label for="last_name1" class="form-label">Apellido Paterno</label>
+        <input type="text" class="form-control" id="last_name1" name="last_name1">
+      </div>
+      <div class="col-md-3">
+        <label for="last_name2" class="form-label">Apellido Materno</label>
+        <input type="text" class="form-control" id="last_name2" name="last_name2">
+      </div>
+      <div class="col-md-3">
+        <label for="nacimiento" class="form-label">Nacimiento</label>
+        <input type="date" class="form-control" id="nacimiento" name="nacimiento" >
+      </div>
+      <!-- <div class="col-12">
+        <label for="inputAddress2" class="form-label">Address 2</label>
+        <input type="text" class="form-control" id="inputAddress2" placeholder="Apartment, studio, or floor">
+      </div>
+      <div class="col-md-6">
+        <label for="inputCity" class="form-label">City</label>
+        <input type="text" class="form-control" id="inputCity">
+      </div>
+      <div class="col-md-4">
+        <label for="inputState" class="form-label">State</label>
+        <select id="inputState" class="form-select">
+          <option selected>Choose...</option>
+          <option>...</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label for="inputZip" class="form-label">Zip</label>
+        <input type="text" class="form-control" id="inputZip">
+      </div>
+      <div class="col-12">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="gridCheck">
+          <label class="form-check-label" for="gridCheck">
+            Check me out
+          </label>
+        </div>
+      </div> -->
+      <div class="col-12 d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+      </div>
+    </form>
+        
 
 {% if clientes %}
 
@@ -75,7 +63,6 @@
 {% endif %}
 
 {% for cliente in clientes %}
-{{cliente.id}}
 <section class="accordion" id="accordionClient{{cliente.id}}">
     <div class="accordion-item">
         <h2 class="accordion-header">
