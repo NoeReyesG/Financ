@@ -7,6 +7,7 @@ from .models import Cliente, User, Prestamo, Abono
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.validators import RegexValidator
+from decimal import Decimal
 
 
 
@@ -15,15 +16,17 @@ class customerForm(forms.Form):
     
     nombre = forms.CharField(label = "Nombre", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
     apellido_paterno = forms.CharField(label = "Apellido Paterno", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
-    apellido_materno = forms.CharField(label = "Apellido Materno", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
+    apellido_materno = forms.CharField(required = False, label = "Apellido Materno", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
     nacimiento = forms.DateField(label = "Fecha de Nacimiento", widget = forms.DateInput(attrs={'type': 'date', 'class':'form-control'}))
     calle = forms.CharField(label="Calle", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
     numero = forms.CharField(label="Número", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
     colonia = forms.CharField(label="Colonia", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
     ciudad = forms.CharField(label="Ciudad", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
-    cp = forms.CharField(label = "C.P.", max_length=4, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    cp = forms.CharField(label = "C.P.", max_length=5, widget = forms.TextInput(attrs = {'class':'form-control'}))
     telefono_regex = RegexValidator(regex=r'\d{10,10}$', message="Formato permitido: '+52 4431234567'. Diez digitos.")
     telefono = forms.CharField(validators=[telefono_regex], max_length=13, required=False, widget = forms.TextInput(attrs = {'class':'form-control', 'type':'number'})) 
+    email = forms.EmailField(max_length = 250, required = False, widget = forms.TextInput(attrs = {'class':'form-control', 'type':'email'}))
+
 
 def index(request):
     if request.user.is_authenticated:
@@ -164,6 +167,12 @@ def cliente_config(request, id=None):
     return render(request, "financiera/cliente.html", context)
 
 
+@login_required
+def update_cliente(request, cliente_id):
+    pass
+
+
+
 # def actualizar_cliente(cliente, pk):
 @login_required
 def nuevo_prestamo(request, cliente_id):
@@ -191,8 +200,14 @@ def pago(request, prestamo_id):
     if request.method == 'POST':
         cantidad = request.POST['pagoInp'+str(prestamo_id)]
         # user = User.objects.filter(id=request.user)
-        prestamo = Prestamo.objects.filter(id = prestamo_id)
-        abono = Abono(prestamo_id = prestamo[0], cantidad = cantidad)
-        abono.save()
+        prestamo = Prestamo.objects.get(id = prestamo_id)
+          
+        abono = Abono(prestamo_id = prestamo, cantidad = cantidad)
+        prestamo.balance = prestamo.balance - Decimal(cantidad)
+        if prestamo.balance >= 0:
+            abono.save()
+            prestamo.save()
+        else:
+            return HttpResponse("El pago es mayor a lo que se debe, favor de revisar")
         print(request.user, prestamo_id, abono)
-        return HttpResponse('Todo chido')
+        return HttpResponse("ok")

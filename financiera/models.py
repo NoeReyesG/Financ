@@ -20,9 +20,10 @@ class Cliente (models.Model):
     numero = models.CharField(max_length= 10)
     colonia = models.CharField(max_length = 100)
     ciudad = models.CharField(max_length = 100)
-    cp = models.CharField(max_length=4)
+    cp = models.CharField(max_length=5)
     telefono_regex = RegexValidator(regex=r'^\d{10,10}$', message="Formato permitido: '4431234567'. Diez digitos.")
-    telefono = models.CharField(blank = True, validators=[telefono_regex], max_length=13) 
+    telefono = models.CharField(blank = True, validators=[telefono_regex], max_length=13)
+    email = models.EmailField(max_length=250, blank= True, default=None) 
 
     # def __str__(self):
     #     string = self.nombre + " " + self.apellido_paterno + " " + self.apellido_materno
