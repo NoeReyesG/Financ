@@ -1,5 +1,5 @@
 from django.db import IntegrityError
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django  import forms
@@ -94,6 +94,9 @@ def signin(request):
 def registrarCliente(request):
     '''Registra un nuevo cliente que adquirirá los servicios'''
     context = {}
+
+    # resaltar navbar link 
+    context["nuevoCliente"]="active"
     
     if request.method == 'POST':
         
@@ -146,15 +149,19 @@ def consultar_cliente(request):
             print(cliente.telefono)
         print("algo")
         return render(request, "financiera/consultas.html", {
-            "clientes" : clientes
+            "clientes" : clientes,
+            # resaltar navbar link
+            "consultarCliente": "active"
         })
     else:
-        return render(request, "financiera/consultas.html")
+        return render(request, "financiera/consultas.html", {
+            "consultarCliente" : "active"
+        })
     
 
 #Administración de cliente
 @login_required
-def cliente_config(request, id=None):
+def cliente_config(request, id=None, mensaje=None):
     context = {}
     if request.method == 'POST':
         pass
@@ -164,12 +171,17 @@ def cliente_config(request, id=None):
             prestamos = Prestamo.objects.filter(cliente_id = cliente[0])
             context['cliente'] = cliente[0]
             context['prestamos'] = prestamos
+            context['mensaje'] = mensaje
     return render(request, "financiera/cliente.html", context)
 
 
 @login_required
 def update_cliente(request, cliente_id):
-    pass
+
+    if request.method == 'POST':
+        body = request.body
+        print(body)
+        return HttpResponse("preparing edit")
 
 
 
@@ -197,17 +209,26 @@ def nuevo_prestamo(request, cliente_id):
 @login_required
 def pago(request, prestamo_id):
     # Registra un pago
+    context = {}
     if request.method == 'POST':
         cantidad = request.POST['pagoInp'+str(prestamo_id)]
         # user = User.objects.filter(id=request.user)
         prestamo = Prestamo.objects.get(id = prestamo_id)
-          
+         
         abono = Abono(prestamo_id = prestamo, cantidad = cantidad)
         prestamo.balance = prestamo.balance - Decimal(cantidad)
         if prestamo.balance >= 0:
-            abono.save()
-            prestamo.save()
-        else:
-            return HttpResponse("El pago es mayor a lo que se debe, favor de revisar")
+            try:
+                abono.save()
+                prestamo.save()
+            except:
+                 return redirect(reverse("cliente_mensaje", kwargs={'id':prestamo.cliente_id.pk, 'mensaje':'fail'}))
+        else: 
+            context['mensaje'] = "un mensaje"
+            return redirect("cliente", id=prestamo.cliente_id.pk)
+          
+            #return HttpResponse("El pago es mayor a lo que se debe, favor de revisar")
         print(request.user, prestamo_id, abono)
-        return HttpResponse("ok")
+       
+        return redirect(reverse("cliente_mensaje", kwargs={'id':prestamo.cliente_id.pk, 'mensaje':'success'}))
+        #return redirect (reverse("cliente_mensaje", context))

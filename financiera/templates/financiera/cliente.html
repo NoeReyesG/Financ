@@ -2,7 +2,21 @@
 {% load static %}
 
 {% block body %}
-    
+   
+    {% if mensaje == 'success' %}
+    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+        Pago registrado correctamente
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+    {% if mensaje == 'fail' %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            Ocurrió un error al realizar el pago, intenta de nuevo
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endif %}
+
     <form class="m-2" id="cliente" onsubmit="editar(event)">
         <div class="d-flex justify-content-between">
             <p class="fs-3 mx-3">Datos del cliente</p>
@@ -95,7 +109,7 @@
                         <section class="row g-3 m-2">
                             <div class="col-md-2">
                                 <label for="cantidad-inicial{{prestamo.id}}" class="form-label">Prestamo por:</label>
-                                <input type="text" class="form-control" id="cantidad-inicial" name="cantidad-inicial{{prestmo.id}}" disabled value = {{prestamo.cantidad_inicial}} >
+                                <input type="text" class="form-control" id="cantidad-inicial{{prestamo.id}}" name="cantidad-inicial{{prestmo.id}}" disabled value = {{prestamo.cantidad_inicial}} >
                             </div>
                             <div class="col-md-1">
                                 <label for="interes{{prestamo.id}}" class="form-label">Interés</label>
@@ -107,20 +121,25 @@
                             </div>
                             <div class="col-md-2">
                                 <label for="fecha{{prestamo.id}}" class="form-label">Fecha de contratación</label>
-                                <input type="date" class="form-control" id="ciudad" name="fecha{{prestamo.id}}" disabled value = {{prestamo.fecha | date:"Y-m-d"}}>
+                                <input type="date" class="form-control" id="fecha{{prestamo.id}}" name="fecha{{prestamo.id}}" disabled value = {{prestamo.fecha | date:"Y-m-d"}}>
                             </div>
                         </section>
 
                         <section>
-                            <form class="row g-3 m-2" action="{% url 'pago' prestamo.id %}" method="post">
+                            <form class="row g-3 m-2"
+                            action="{% url 'pago' prestamo.id %}" 
+                            data-balance="{{prestamo.balance}}"
+                            data-prestamoid = "{{prestamo.id}}"
+                            method="post" 
+                            onsubmit="nuevo_pago(event)">
                                 {% csrf_token %}
                                 <div class="col-auto">
                                 <label for="nuevoPago{{prestamo.id}}" class="visually-hidden">Registrar pago</label>
                                 <input type="text" readonly class="form-control-plaintext" id="nuevoPago{{prestamo.id}}" value="Nuevo pago">
                                 </div>
                                 <div class="col-auto">
-                                <label for="pago" class="visually-hidden">Importe</label>
-                                <input type="number" class="form-control" id="pagoInp{{prestamo.id}}" name="pagoInp{{prestamo.id}}" placeholder="$0.00">
+                                <label for="pagoInp{{prestamo.id}}" class="visually-hidden">Importe</label>
+                                <input type="number" required class="form-control" id="pagoInp{{prestamo.id}}" name="pagoInp{{prestamo.id}}" placeholder="$0.00">
                                 </div>
                                 <div class="col-auto">
                                 <button type="submit" class="btn btn-primary mb-3">Realizar pago</button>
