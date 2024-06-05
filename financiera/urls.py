@@ -13,6 +13,7 @@ urlpatterns = [
     path("cliente/<int:id>/<str:mensaje>", views.cliente_config, name="cliente_mensaje"),
 
     #API
+    path("pedidos", views.pedidos, name="pedidos"),
     path("nuevo-prestamo/<int:cliente_id>", views.nuevo_prestamo, name="nuevo-prestamo"),
     path("pago/<int:prestamo_id>", views.pago, name="pago"),
     path("update/<int:cliente_id>", views.update_cliente, name="update")
