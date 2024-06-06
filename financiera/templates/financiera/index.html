@@ -17,7 +17,7 @@
         function Panel(){
 
             const [isLoading, setIsLoading] = React.useState(true);
-            const [pedidos, setPrestamos] = React.useState(null);
+            const [pedidos, setPedidos] = React.useState(null);
             React.useEffect(()=> {
                 fetch(`/pedidos`)
                 .then((response) => response.json())
@@ -30,7 +30,7 @@
                     });
                     console.log(pedidosL)
                     setIsLoading(false)
-                    setPrestamos(pedidosL)
+                    setPedidos(pedidosL)
                 });
             }, []);
                 console.log("Hello");
@@ -41,10 +41,10 @@
                         </div>);
             }
             return <ul>{pedidos}</ul>
-            // listItems = prestamos.map(function(prestamo, i ){
-            //    <li><span>i</span> prestamo.field.cantidad_inicial</li>
+            // listItems = pedidos.map(function(pedido, i ){
+            //    <li><span>i</span> pedido.field.cantidad_inicial</li>
             // });
-            // return( <ul>{prestamos.map(item => (
+            // return( <ul>{pedidos.map(item => (
             // <li key={item}>{item}</li>
             //     ))}
             // </ul>

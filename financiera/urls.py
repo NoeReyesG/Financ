@@ -14,8 +14,8 @@ urlpatterns = [
 
     #API
     path("pedidos", views.pedidos, name="pedidos"),
-    path("nuevo-prestamo/<int:cliente_id>", views.nuevo_prestamo, name="nuevo-prestamo"),
-    path("pago/<int:prestamo_id>", views.pago, name="pago"),
+    path("nuevo-pedido/<int:cliente_id>", views.nuevo_pedido, name="nuevo-pedido"),
+    path("pago/<int:pedido_id>", views.pago, name="pago"),
     path("update/<int:cliente_id>", views.update_cliente, name="update")
 
     #path('', views.home, name="home")

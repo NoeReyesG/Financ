@@ -28,7 +28,7 @@ function editar(event){
     }
 }
 
-function agregar_prestamo(e){
+function agregar_pedido(e){
     e.preventDefault();
     console.log("ojo aquí");
 }
@@ -43,7 +43,7 @@ function nuevo_pago(e){
    
     const form = e.target
     let balance = form.dataset.balance;
-    let prestamo_id = form.dataset.prestamoid;
+    let pedido_id = form.dataset.pedidoid;
     abono = form.querySelector('input[type="number"]').value;
 
     if (parseInt(balance) >= parseInt(abono)){

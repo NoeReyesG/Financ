@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django  import forms
-from .models import Cliente, User, Prestamo, Abono
+from .models import Cliente, User, Pedidos, Abonos
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.validators import RegexValidator
@@ -16,14 +16,14 @@ from decimal import Decimal
 class customerForm(forms.Form):
     
     nombre = forms.CharField(label = "Nombre", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
-    apellido_paterno = forms.CharField(label = "Apellido Paterno", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
+    apellido_paterno = forms.CharField(label = "Apellido Paterno", required=False, max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
     apellido_materno = forms.CharField(required = False, label = "Apellido Materno", max_length = 100, widget= forms.TextInput(attrs = {'class':'form-control'}))
-    nacimiento = forms.DateField(label = "Fecha de Nacimiento", widget = forms.DateInput(attrs={'type': 'date', 'class':'form-control'}))
-    calle = forms.CharField(label="Calle", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
-    numero = forms.CharField(label="Número", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
-    colonia = forms.CharField(label="Colonia", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
-    ciudad = forms.CharField(label="Ciudad", max_length=50, widget = forms.TextInput(attrs = {'class':'form-control'}))
-    cp = forms.CharField(label = "C.P.", max_length=5, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    nacimiento = forms.DateField(label = "Fecha de Nacimiento", required=False, widget = forms.DateInput(attrs={'type': 'date', 'class':'form-control'}))
+    calle = forms.CharField(label="Calle", max_length=50, required=False, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    numero = forms.CharField(label="Número", max_length=50, required=False, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    colonia = forms.CharField(label="Colonia", max_length=50, required=False, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    ciudad = forms.CharField(label="Ciudad", max_length=50, required=False, widget = forms.TextInput(attrs = {'class':'form-control'}))
+    cp = forms.CharField(label = "C.P.", max_length=5, required=False, widget = forms.TextInput(attrs = {'class':'form-control'}))
     telefono_regex = RegexValidator(regex=r'\d{10,10}$', message="Formato permitido: '+52 4431234567'. Diez digitos.")
     telefono = forms.CharField(validators=[telefono_regex], max_length=13, required=False, widget = forms.TextInput(attrs = {'class':'form-control', 'type':'number'})) 
     email = forms.EmailField(max_length = 250, required = False, widget = forms.TextInput(attrs = {'class':'form-control', 'type':'email'}))
@@ -104,7 +104,7 @@ def registrarCliente(request):
         cliente =  customerForm(request.POST)
         if cliente.is_valid():
             cliente = cliente.cleaned_data
-        
+
             try:
                 Cliente.objects.get(user_id = request.user,
                                     nombre=cliente["nombre"], 
@@ -169,9 +169,9 @@ def cliente_config(request, id=None, mensaje=None):
     else:
         if id:
             cliente = Cliente.objects.filter(user_id = request.user, id = id)
-            prestamos = Prestamo.objects.filter(cliente_id = cliente[0])
+            pedidos = Pedidos.objects.filter(cliente_id = cliente[0])
             context['cliente'] = cliente[0]
-            context['prestamos'] = prestamos
+            context['pedidos'] = pedidos
             context['mensaje'] = mensaje
     return render(request, "financiera/cliente.html", context)
 
@@ -188,56 +188,56 @@ def update_cliente(request, cliente_id):
 
 # def actualizar_cliente(cliente, pk):
 @login_required
-def nuevo_prestamo(request, cliente_id):
+def nuevo_pedido(request, cliente_id):
     if request.method == 'POST':
-        cantidad = request.POST['cantidad']
-        parcialidades = request.POST['parcialidades']
-        interes = request.POST['interes']
-
         cliente = Cliente.objects.get(pk=cliente_id, user_id = request.user)
-
-        nuevo_prestamo = Prestamo(cliente_id = cliente, 
-                                cantidad_inicial = cantidad,
-                                balance = cantidad,
-                                parcialidades = parcialidades,
-                                interes = interes
-                                )
-        nuevo_prestamo.save()
-
-    return HttpResponseRedirect(reverse("cliente", kwargs={"id": cliente_id}))
+        nuevo_pedido = Pedidos(cliente_id = cliente)
+        nuevo_pedido.save()
+        return HttpResponseRedirect(reverse("cliente", kwargs={"id": cliente_id}))
 
 
 @login_required
-def pago(request, prestamo_id):
+def agregar_articulo(request):
+    #  if request.method == 'POST':
+    #     cantidad = request.POST['cantidad']
+    #     parcialidades = request.POST['parcialidades']
+    #     interes = request.POST['interes']
+
+    #     cliente = Cliente.objects.get(pk=cliente_id, user_id = request.user)
+    pass
+
+
+@login_required
+def pago(request, pedido_id):
     # Registra un pago
     context = {}
     if request.method == 'POST':
-        cantidad = request.POST['pagoInp'+str(prestamo_id)]
+        cantidad = request.POST['pagoInp'+str(pedido_id)]
         # user = User.objects.filter(id=request.user)
-        prestamo = Prestamo.objects.get(id = prestamo_id)
+        pedido = Pedidos.objects.get(id = pedido_id)
          
-        abono = Abono(prestamo_id = prestamo, cantidad = cantidad)
-        prestamo.balance = prestamo.balance - Decimal(cantidad)
-        if prestamo.balance >= 0:
+        abono = Abonos(pedido_id = pedido, cantidad = cantidad)
+        pedido.balance = pedido.balance - Decimal(cantidad)
+        if pedido.balance >= 0:
             try:
                 abono.save()
-                prestamo.save()
+                pedido.save()
             except:
-                 return redirect(reverse("cliente_mensaje", kwargs={'id':prestamo.cliente_id.pk, 'mensaje':'fail'}))
+                 return redirect(reverse("cliente_mensaje", kwargs={'id':pedido.cliente_id.pk, 'mensaje':'fail'}))
         else: 
             context['mensaje'] = "un mensaje"
-            return redirect("cliente", id=prestamo.cliente_id.pk)
+            return redirect("cliente", id=pedido.cliente_id.pk)
           
             #return HttpResponse("El pago es mayor a lo que se debe, favor de revisar")
-        print(request.user, prestamo_id, abono)
+        print(request.user, pedido_id, abono)
        
-        return redirect(reverse("cliente_mensaje", kwargs={'id':prestamo.cliente_id.pk, 'mensaje':'success'}))
+        return redirect(reverse("cliente_mensaje", kwargs={'id':pedido.cliente_id.pk, 'mensaje':'success'}))
         #return redirect (reverse("cliente_mensaje", context))
 
     
 @login_required
 def pedidos(request):
-    pedidos = Prestamo.objects.all()
+    pedidos = Pedidos.objects.all()
     pedidos = serialize("json", pedidos)
     print(pedidos)
     return JsonResponse(pedidos, safe=False)

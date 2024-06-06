@@ -17,18 +17,18 @@
         </div>
     {% endif %}
 
-    <form class="m-2" id="cliente" onsubmit="editar(event)">
+    
         <div class="d-flex justify-content-between">
             <p class="fs-3 mx-3">Datos del cliente</p>
             
-            <button type="button"
-            class="btn btn-primary my-3 mx-5"
-            data-bs-toggle="modal" 
-            data-bs-target="#prestamoModal"> Nuevo prestamo</button>
+            <form action="{% url 'nuevo-pedido' cliente.id %}" method="post" >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary my-3 mx-5"> Nuevo pedido</button>
+            </form>
 
         </div>
         
-
+    <form class="m-2" id="cliente" onsubmit="editar(event)">
         <section class="row g-3 m-2">
             <!-- <div class="col-md-2"></div> -->
             <div class="col-md-2">
@@ -92,54 +92,62 @@
         </div>
     </form>
 
-    <p class="fs-3 m-2">Prestamos</p>
+    <p class="fs-3 m-2">Pedidos</p>
 
     <section class="mb-5">
-        {% for prestamo in prestamos %}
-        <section class="accordion" id="accordionPrestamo">
+        {% for pedido in pedidos %}
+        <section class="accordion" id="accordionPedido">
             <div class="accordion-item">
             <h2 class="accordion-header">
-                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne{{prestamo.id}}" aria-expanded="false" aria-controls="collapseOne">
-                Prestamo {{prestamo.fecha| date}}
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne{{pedido.id}}" aria-expanded="false" aria-controls="collapseOne">
+                Pedido {{pedido.fecha| date}}
                 </button>
             </h2>
-                <div id="collapseOne{{prestamo.id}}" class="accordion-collapse collapse" data-bs-parent="#accordionPrestamo">
+                <div id="collapseOne{{pedido.id}}" class="accordion-collapse collapse" data-bs-parent="#accordionPedido">
+                    
+                    <!-- Boton agregar articulo -->
+                    <button type="button"
+                    class="btn btn-primary my-3 mx-5"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#pedidoModal"> Agregar artículo</button>
+                    <!-- Fin del boton agregar artículo-->
+
                     <div class="accordion-body">
 
                         <section class="row g-3 m-2">
                             <div class="col-md-2">
-                                <label for="cantidad-inicial{{prestamo.id}}" class="form-label">Prestamo por:</label>
-                                <input type="text" class="form-control" id="cantidad-inicial{{prestamo.id}}" name="cantidad-inicial{{prestmo.id}}" disabled value = {{prestamo.cantidad_inicial}} >
+                                <label for="cantidad-inicial{{pedido.id}}" class="form-label">Pedido por:</label>
+                                <input type="text" class="form-control" id="cantidad-inicial{{pedido.id}}" name="cantidad-inicial{{pedido.id}}" disabled value = {{pedido.cantidad_inicial}} >
                             </div>
                             <div class="col-md-1">
-                                <label for="interes{{prestamo.id}}" class="form-label">Interés</label>
-                                <input type="number" class="form-control" id="interes{{prestamo.id}}" name="interes{{prestamo.id}}" disabled value = {{prestamo.interes}}>
+                                <label for="interes{{pedido.id}}" class="form-label">Interés</label>
+                                <input type="number" class="form-control" id="interes{{pedido.id}}" name="interes{{pedido.id}}" disabled value = {{pedido.interes}}>
                             </div>
                             <div class="col-md-3">
-                                <label for="saldo{{prestamo.id}}" class="form-label">Saldo restante</label>
-                                <input type="text" class="form-control" id="saldo{{prestamo.id}}" name="saldo{{prestamo.id}}" disabled value ={{prestamo.balance}}>
+                                <label for="saldo{{pedido.id}}" class="form-label">Saldo restante</label>
+                                <input type="text" class="form-control" id="saldo{{pedido.id}}" name="saldo{{pedido.id}}" disabled value ={{pedido.balance}}>
                             </div>
                             <div class="col-md-2">
-                                <label for="fecha{{prestamo.id}}" class="form-label">Fecha de contratación</label>
-                                <input type="date" class="form-control" id="fecha{{prestamo.id}}" name="fecha{{prestamo.id}}" disabled value = {{prestamo.fecha | date:"Y-m-d"}}>
+                                <label for="fecha{{pedido.id}}" class="form-label">Fecha de contratación</label>
+                                <input type="date" class="form-control" id="fecha{{pedido.id}}" name="fecha{{pedido.id}}" disabled value = {{pedido.fecha | date:"Y-m-d"}}>
                             </div>
                         </section>
 
                         <section>
                             <form class="row g-3 m-2"
-                            action="{% url 'pago' prestamo.id %}" 
-                            data-balance="{{prestamo.balance}}"
-                            data-prestamoid = "{{prestamo.id}}"
+                            action="{% url 'pago' pedido.id %}" 
+                            data-balance="{{pedido.balance}}"
+                            data-pedidoid = "{{pedido.id}}"
                             method="post" 
                             onsubmit="nuevo_pago(event)">
                                 {% csrf_token %}
                                 <div class="col-auto">
-                                <label for="nuevoPago{{prestamo.id}}" class="visually-hidden">Registrar pago</label>
-                                <input type="text" readonly class="form-control-plaintext" id="nuevoPago{{prestamo.id}}" value="Nuevo pago">
+                                <label for="nuevoPago{{pedido.id}}" class="visually-hidden">Registrar pago</label>
+                                <input type="text" readonly class="form-control-plaintext" id="nuevoPago{{pedido.id}}" value="Nuevo pago">
                                 </div>
                                 <div class="col-auto">
-                                <label for="pagoInp{{prestamo.id}}" class="visually-hidden">Importe</label>
-                                <input type="number" required class="form-control" id="pagoInp{{prestamo.id}}" name="pagoInp{{prestamo.id}}" placeholder="$0.00">
+                                <label for="pagoInp{{pedido.id}}" class="visually-hidden">Importe</label>
+                                <input type="number" required class="form-control" id="pagoInp{{pedido.id}}" name="pagoInp{{pedido.id}}" placeholder="$0.00">
                                 </div>
                                 <div class="col-auto">
                                 <button type="submit" class="btn btn-primary mb-3">Realizar pago</button>
@@ -151,7 +159,7 @@
                     <!-- abonos -->
 
                     <ul class="list-group container mb-5">
-                    {% for abono in prestamo.abono_set.all %}
+                    {% for abono in pedido.abono_set.all %}
 
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                           {{abono.cantidad}}
@@ -168,20 +176,20 @@
            
 
         {%empty%}
-            <p class="fs-2 m-2 p-2">Cliente sin prestamos</p>
+            <p class="fs-2 m-2 p-2">Cliente sin pedidos</p>
         {% endfor %}
     </section>
 
 
-    <!--Modal para nuevo prestamo-->
-    <section class="modal fade" id="prestamoModal" tabindex="-1" aria-labelledby="prestamoModalLabel" aria-hidden="true">
+    <!--Modal para nuevo pedido-->
+    <section class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
-              <h1 class="modal-title fs-5" id="prestamoModalLabel">Nuevo prestamo a nombre de {{cliente.nombre}} {{cliente.apellido_paterno}} {{cliente.apellido_materno}}</h1>
+              <h1 class="modal-title fs-5" id="pedidoModalLabel">Nuevo pedido a nombre de {{cliente.nombre}} {{cliente.apellido_paterno}} {{cliente.apellido_materno}}</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'nuevo-prestamo' cliente.id %}" method="post">
+            <form action="{% url 'nuevo-pedido' cliente.id %}" method="post">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class ="mb-3">
@@ -204,7 +212,7 @@
                 </div>
                 <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" id="btn-prestamo" class="btn btn-primary">Agregar</button>
+                <button type="submit" id="btn-pedido" class="btn btn-primary">Agregar</button>
                 </div>
             </form>
           </div>
