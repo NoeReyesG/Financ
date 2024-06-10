@@ -2,7 +2,6 @@
 {% load static %}
 
 {% block body %}
-   
     {% if mensaje == 'success' %}
     <div class="alert alert-primary alert-dismissible fade show" role="alert">
         Pago registrado correctamente
@@ -185,75 +184,124 @@
     </section>
 
 
+
+    
     <!--Modal para nuevo pedido-->
     <section class="modal fade" id="pedidoModal" tabindex="-1" aria-labelledby="pedidoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="pedidoModalLabel">Nuevo pedido a nombre de {{cliente.nombre}} {{cliente.apellido_paterno}} {{cliente.apellido_materno}}</h1>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-modal-button"></button>
             </div>
-            <form action="{% url 'nuevo-pedido' cliente.id %}" method="post" onsubmit="nuevo_articulo(event)">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class ="mb-3">
-                        <label for="cantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="cantidad" name="cantidad" required value="1">
-                    </div>
-                    <div class ="mb-3">
-                        <label for="titulo" class="form-label">Titulo</label>
-                        <input type="text" class="form-control" id="titulo" name="titulo">
-                    </div>
-                    <div class ="mb-3">
-                        <label for="url" class="form-label">Liga de Shein</label>
-                        <input type="url" class="form-control" id="url" name="url" placeholder="">
-                    </div>
-                    <div class ="mb-3">
-                        <label for="precio" class="form-label">Precio</label>
-                        <input type="" class="form-control" id="precio" name="precio" placeholder="$00.00">
-                    </div>    
-                </div>
+            <!-- sección para el modal de React -->
+            <section id="modal-form">
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" id="btn-pedido" class="btn btn-primary">Agregar</button>
-                </div>
-            </form>
+            </section>  
+
           </div>
         </div>
       </div>
-{% endblock %}
+    </section>
 
-   <script type="text/babel">
-        var articles = []
+    <section id="prueba"></section>
+
+    <script type="text/babel">
+        var articles = [{titulo:"Un titulo más chido", cantidad:2, url:"", precio:""}]
         
-        function newArticleForm(){
+        function NewArticleForm(){
+            const [formData, setFormData] = React.useState({titulo:"", cantidad:2, url:"", precio:""})
             let article = {}
-                 
-        }
+            function handleChange(event){
+                const name = event.target.name;
+                const value = event.target.value;
 
-        function Article(props){
+                setFormData( values => ({...values, [name]:value}));
+            }
+            function addArticle(event){
+                event.preventDefault();
+                //console.log(formData);
+                articles.unshift(formData);
+                console.log(articles);
+                document.querySelector("#close-modal-button").click();
+            }
             return (
-    
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {props.title}
-                        </li>
-                    
-                
-            )
+                <form onSubmit={addArticle}>
+                    <div class="modal-body">
+                        <div class ="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input 
+                            type="number" 
+                            value={formData.cantidad}
+                            onChange = {handleChange} 
+                            class="form-control" 
+                            id="cantidad" 
+                            name="cantidad" 
+                            required  />
+                        </div>
+                        <div class ="mb-3">
+                            <label for="titulo" class="form-label">Titulo</label>
+                            <input 
+                            type="text" 
+                            value={formData.titulo}
+                            onChange = {handleChange}  
+                            class="form-control" 
+                            id="titulo" 
+                            name="titulo" />
+                        </div>
+                        <div class ="mb-3">
+                            <label for="url" class="form-label">Liga de Shein</label>
+                            <input 
+                            type="url" 
+                            value={formData.url} 
+                            onChange = {handleChange} 
+                            class="form-control" 
+                            id="url" 
+                            name="url" 
+                            placeholder="" />
+                        </div>
+                        <div class ="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input 
+                            type="number" 
+                            value= {formData.precio || ""}
+                            onChange = {handleChange} 
+                            class="form-control" 
+                            id="precio" 
+                            name="precio" 
+                            placeholder="$00.00" />
+                        </div>    
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" id="btn-pedido" class="btn btn-primary">Agregar</button>
+                    </div>
+                </form>
+            );
         }
 
-        function Articles(){
-            const articles = []
+        function Articulo(props){
+           return (<li>{props.titulo}</li>);
+        }
+
+        function Articulos(){
+            //const articulos = [{titulo:"Un titulo chido", cantidad:2, url:"", precio:""}]
             //const [formData, setFormData] = React.useState({'cantidad':'', 'titulo':'', 'url':'', 'precio':''})
             
             return(
                 <ul class="list-group container mb-5">
-                    {articles.map((article) => <Article title={article.title} />)}
+                    <li>Articulos</li>
+                    {articles.map((articulo) => <Articulo titulo={articulo.titulo} />)}
                 </ul>
             )
         }
+        ReactDOM.render(<NewArticleForm />, document.querySelector("#modal-form"));
+        ReactDOM.render(<Articulos />, document.querySelector("#prueba"));
    </script>   
+{% endblock %}
+
+   
 {% block script %}
     <script type="text/javascript" src="{% static 'financiera/cliente.js' %}"></script>
 {% endblock %}
