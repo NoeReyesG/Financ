@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded',()=>{
    
 })
 
+var pedidos = []
 let save = false;
 
 /**
@@ -58,6 +59,21 @@ function nuevo_pago(e){
     
     //const data = new FormData(e.target);
     //console.log([...data.entries()]);
+}
+
+
+function nuevo_articulo(event){
+    event.preventDefault();
+    let articulo = {}
+    const data = new FormData(event.target);
+    articulo['cantidad'] = data.get("cantidad");
+    articulo['titulo'] = data.get("titulo");
+    articulo['url'] = data.get('url');
+    articulo['precio'] = data.get('precio');
+    
+    pedidos.unshift(articulo);
+    console.log(pedidos);
+    
 }
 
 async function aplicarPago(){

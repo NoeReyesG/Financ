@@ -109,7 +109,8 @@
                     <button type="button"
                     class="btn btn-primary my-3 mx-5"
                     data-bs-toggle="modal" 
-                    data-bs-target="#pedidoModal"> Agregar artículo</button>
+                    data-bs-target="#pedidoModal"
+                    onclick=""> Agregar artículo</button>
                     <!-- Fin del boton agregar artículo-->
 
                     <div class="accordion-body">
@@ -158,6 +159,9 @@
 
                     <!-- abonos -->
 
+                    <section id="articulos">
+                    </section>
+
                     <ul class="list-group container mb-5">
                     {% for abono in pedido.abono_set.all %}
 
@@ -189,30 +193,30 @@
               <h1 class="modal-title fs-5" id="pedidoModalLabel">Nuevo pedido a nombre de {{cliente.nombre}} {{cliente.apellido_paterno}} {{cliente.apellido_materno}}</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'nuevo-pedido' cliente.id %}" method="post">
+            <form action="{% url 'nuevo-pedido' cliente.id %}" method="post" onsubmit="nuevo_articulo(event)">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class ="mb-3">
                         <label for="cantidad" class="form-label">Cantidad</label>
-                        <input type="number" class="form-control" id="cantidad" name="cantidad" required>
+                        <input type="number" class="form-control" id="cantidad" name="cantidad" required value="1">
                     </div>
                     <div class ="mb-3">
-                        <label for="interes" class="form-label">Interes</label>
-                        <input type="number" class="form-control" id="interes" name="interes" required placeholder="0.00%" step="0.01", min="0">
+                        <label for="titulo" class="form-label">Titulo</label>
+                        <input type="text" class="form-control" id="titulo" name="titulo">
                     </div>
-                    <select class="form-select" aria-label="Default select" id="parcialidades" name="parcialidades" required>
-                        <option selected disabled>Selecciona un plazo</option>
-                        <option value="3">3 meses</option>
-                        <option value="6">6 meses</option>
-                        <option value="9">9 meses</option>
-                        <option value="12">12 meses</option>
-                        <option value="18">18 meses</option>
-                        <option value="24">24 meses</option>
-                    </select>
+                    <div class ="mb-3">
+                        <label for="url" class="form-label">Liga de Shein</label>
+                        <input type="url" class="form-control" id="url" name="url" placeholder="">
+                    </div>
+                    <div class ="mb-3">
+                        <label for="precio" class="form-label">Precio</label>
+                        <input type="" class="form-control" id="precio" name="precio" placeholder="$00.00">
+                    </div>    
                 </div>
+
                 <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" id="btn-pedido" class="btn btn-primary">Agregar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" id="btn-pedido" class="btn btn-primary">Agregar</button>
                 </div>
             </form>
           </div>
@@ -220,7 +224,36 @@
       </div>
 {% endblock %}
 
+   <script type="text/babel">
+        var articles = []
+        
+        function newArticleForm(){
+            let article = {}
+                 
+        }
 
+        function Article(props){
+            return (
+    
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {props.title}
+                        </li>
+                    
+                
+            )
+        }
+
+        function Articles(){
+            const articles = []
+            //const [formData, setFormData] = React.useState({'cantidad':'', 'titulo':'', 'url':'', 'precio':''})
+            
+            return(
+                <ul class="list-group container mb-5">
+                    {articles.map((article) => <Article title={article.title} />)}
+                </ul>
+            )
+        }
+   </script>   
 {% block script %}
     <script type="text/javascript" src="{% static 'financiera/cliente.js' %}"></script>
 {% endblock %}
