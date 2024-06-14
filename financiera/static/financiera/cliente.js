@@ -75,6 +75,20 @@ function nuevo_articulo(event){
     console.log(pedidos);
     
 }
+/**
+ * Function to set the order-id to the item that's been added to the order.
+ * We pass the data from the button "Agregar articulo" (add item) to the button agregar (add)
+ * inside the component, in this way we identified the order where the item must be placed.
+ * 
+ * @param {*} e 
+ */
+function setPedidoIdToModal(e){
+    id =  e.target.dataset.pedido;
+    console.log(id);
+    document.querySelector("#btn-pedido").dataset.pedidoId=id;
+}
+
+
 
 async function aplicarPago(){
 

@@ -116,9 +116,11 @@
                         class="btn btn-primary my-3 mx-5"
                         data-bs-toggle="modal" 
                         data-bs-target="#pedidoModal"
-                        onclick=""> Agregar artículo</button>
-                        <!-- Fin del boton agregar artículo-->
+                        data-pedido ="{{pedido.id}}"
+                        onclick="setPedidoIdToModal(event)"> Agregar artículo</button>
                     </div>
+                    <!-- Fin del boton agregar artículo-->
+
                     <div class="accordion-body">
 
                         <section class="row g-3 m-2">
@@ -165,7 +167,7 @@
 
                     <!-- abonos -->
 
-                    <section id="articulos">
+                    <section id="articulos{{pedido.id}}" class="m-0 p-0 m-md-5 p-md-4 ">
                     </section>
 
                     <ul class="list-group container mb-5">
@@ -214,8 +216,25 @@
     <section id="prueba"></section>
 
     <script type="text/babel">
-        //const ArticlesContext = React.createContext([{titulo:"Un titulo más chido", cantidad:1, url:"", precio:""}])
-        const articulos = []
+        
+        const articulos = [];
+
+        /**
+         * Calculates the total price adding each price of every item. 
+         */
+        function calcularTotal(){
+            //Total price of items added
+            let total = 0;
+            // let total = articulos.reduce(
+            //     (acumulador, {precio}) => acumulador + parseFloat(precio), initValue
+            // );
+            articulos.forEach((articulo) =>{
+                total += articulo.cantidad*articulo.precio
+            })
+            total = total.toFixed(2);
+            return total;
+        }
+
         function NewArticleForm(){
             const [formData, setFormData] = React.useState({id:1, titulo:"", cantidad:1, url:"", precio:""});
             const [articles, setArticles] = React.useState([]);
@@ -229,25 +248,24 @@
             }
 
             function addArticle(){
-                //console.log(formData);
-                //setArticles([...articles, formData]);
-                //console.log(articles);
+                
+               //Order Identifier to add articles within this order.
+                let pedidoId = document.querySelector("#btn-pedido").dataset.pedidoId;
                 let newId = 1;
                 if (!formData.cantidad  || formData.cantidad < 0){ 
                     return;
                 }
-                console.log(articulos.length);
+                
                 if (articulos.length > 0){
-                    console.log(articulos[0]);
                     newId = articulos.length + 2;
                 }
                 articulos.push(formData);
-                //console.log("después");
-                console.log(articulos.length); 
+             
                 setFormData({id :newId , titulo:"", cantidad:1, url:"", precio:""});
-                callFunction();
+                renderList(pedidoId);
                 document.querySelector("#close-modal-button").click();
             }
+            
             return (
                 //<ArticlesContext.Provider value={articles}>
                     <form>
@@ -300,7 +318,7 @@
 
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" id="btn-pedido" class="btn btn-primary" onClick={addArticle}>Agregar</button>
+                            <button type="button" id="btn-pedido" data-pedido-id="0" class="btn btn-primary" onClick={addArticle}>Agregar</button>
                         </div>
                     </form>
                 //</ArticlesContext.Provider>
@@ -309,64 +327,171 @@
 
         function Articulo(props){
 
+                
+            let breakpoint = 768;
             //Display text if url is added by user
             let urlText = "";
-            if (props.url){
+            if (props.articulo.url){
                 urlText = "Ver artículo";
             }
 
+            let titulo = props.articulo.titulo? props.articulo.titulo: `Articulo ${props.index+1}`;
+            
+            let precioPorArticulo = 0;
+            let subtotal = 0;
+            //let precioPorArticulo = props.articulo.precio? parseFloat(props.articulo.precio).toFixed(2) : 0;
+            if (props.articulo.precio){
+                precioPorArticulo = parseFloat(props.articulo.precio).toFixed(2);
+                subtotal = (precioPorArticulo*props.articulo.cantidad).toFixed(2);
+            }
 
-           function deleteArticle(index){
-             articulos.splice(index, 1);
-             console.log(articulos);
-             callFunction()  
-           } 
-           return (
-            <tr>
-                <td>{props.index+1}</td>
-                <td>{props.titulo}</td> 
-                <td>{props.cantidad}</td>
-                <td><a href={props.url}>{urlText}</a></td>
-                <td class=""> 
-                    <a href="#" onClick={() => deleteArticle(props.index)} >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                            <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                        </svg>
-                    </a>
-                </td>
-            </tr>
+            //let subtotal = parseFloat(props.articulo.precio) 
+            function deleteArticle(index){
+                let pedidoId = document.querySelector("#btn-pedido").dataset.pedidoId;
+                articulos.splice(index, 1);
+                console.log(articulos);
+                renderList(pedidoId);  
+            }
+
+
+            if(props.width > breakpoint){
+                
+                return (
+                <tr>
+                    <td>{props.index+1}</td>
+                    <td>{titulo}</td> 
+                    <td>{props.articulo.cantidad}</td>
+                    <td><a href={props.articulo.url}>{urlText}</a></td>
+                    <td>$ {precioPorArticulo}</td>
+                    <td>$ {subtotal}</td>
+
+                    <td class=""> 
+                        <span role="button" onClick={() => deleteArticle(props.index)} >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                        </span>
+                    </td>
+                </tr>
             );
         }
+        else {
+            titulo = props.articulo.url? <a href={props.articulo.url}>{titulo}</a>: titulo; 
+            return(
+                <tr>
+                    <td> {titulo}</td> 
+                    <td>{props.articulo.cantidad}</td>
+                    <td>{precioPorArticulo}</td>
+                    <td>$ {subtotal}</td>
+                    <td class=""> 
+                        <span role="button" onClick={() => deleteArticle(props.index)} >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
+                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
+                            </svg>
+                        </span>
+                    </td>
+                </tr>
+            )
+        }
+    }
 
         function Articulos(){
             //const articles = React.useContext(ArticlesContext);
             //const [articulos, setArticulos] = React.useState(articles);
+            //Render content conditionally to screen size for responsive design
+            const [width, setWidth] = React.useState(window.innerWidth);
+                const breakpoint = 768; 
+
+
+                React.useEffect(() => {
+                    const handleResizeWindow = () => setWidth(window.innerWidth);
+                        // subscribe to window resize event "onComponentDidMount"
+                        window.addEventListener("resize", handleResizeWindow);
+                        return () => {
+                        // unsubscribe "onComponentDestroy"
+                        window.removeEventListener("resize", handleResizeWindow);
+                        };
+                }, []);
+                
             if ( articulos.length > 0 ){
-                return(
-                    <section class="m-5 p-4">
-                        <h2>Articulos</h2>
-                        <table class="table table-hover table-striped">
-                            <thead>
+                let total = calcularTotal();
+                console.log(total);
+                if (width > breakpoint){
+                    return(
+                        <section class="">
+                            <h2>Articulos</h2>
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>    
+                                        <th>Titulo</th>    
+                                        <th>Cantidad</th>
+                                        <th>URL</th>
+                                        <th>Precio</th>
+                                        <th>Subtotal</th>
+                                        <th>Eliminar</th>    
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {articulos.map((articulo, i) => <Articulo articulo = {articulo} index={i} width={width} />)}
+                                </tbody>
+                                <tfoot>
                                 <tr>
-                                    <th>#</th>    
-                                    <th>Titulo</th>    
-                                    <th>Cantidad</th>
-                                    <th>URL</th>
-                                    <th>Eliminar</th>    
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {articulos.map((articulo, i) => <Articulo titulo={articulo.titulo} cantidad={articulo.cantidad} url={articulo.url} index={i}  />)}
-                            </tbody>
-                        </table>
-                    </section>
-                )
+                                    <td><b>Total</b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><b>$ {total}</b></td>
+                                    <td></td>
+
+                                </tr>    
+                                </tfoot>
+                            </table>
+                        </section>
+                    )
+                }
+                else{
+                    return(
+                        <section class="">
+                            <h2>Articulos</h2>
+                            <table class="table table-hover table-striped">
+                                <thead>
+                                    <tr>    
+                                        <th>Titulo</th>    
+                                        <th>Cantidad</th>
+                                        <th>Precio</th>
+                                        <th>Subtotal</th>
+                                        <th>Eliminar</th>    
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {articulos.map((articulo, i) => <Articulo articulo = {articulo} index={i} width={width} />)}
+                                </tbody>
+                                <tfoot>
+                                <tr>
+                                    <td><b>Total</b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><b>$ {total}</b></td>
+                                    <td></td>
+                                </tr>    
+                                </tfoot>
+                            </table>
+                        </section>
+                    )
+                }
+            }
+            else{
+                return <section></section>;
             }
         }
         ReactDOM.render(<NewArticleForm />, document.querySelector("#modal-form"));
-        function callFunction(){ 
-            ReactDOM.render(<Articulos />, document.querySelector("#prueba"));
+        function renderList(id){
+             
+            ReactDOM.render(<Articulos />, document.querySelector(`#articulos${id}`));
         }
    </script>   
 {% endblock %}
